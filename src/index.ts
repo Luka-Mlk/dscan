@@ -1,5 +1,4 @@
 import path from "path";
-import fs from "fs";
 import DependencyGraph from "./graph/dependency.js";
 import Cli from "./cli/cli.js";
 import { ImportResolver } from "./resolver/import.js";
