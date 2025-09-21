@@ -8,6 +8,7 @@ const args = process.argv.slice(2);
 // CLI options
 let depth = Infinity;
 let outputJson = false;
+let verbose = false;
 
 const files: string[] = [];
 
@@ -18,24 +19,27 @@ for (let i = 0; i < args.length; i++) {
     i++;
   } else if (args[i] === "--json") {
     outputJson = true;
+  } else if (args[i] === "--verbose") {
+    verbose = true;
   } else {
     files.push(args[i] as string);
   }
 }
 
 if (files.length === 0) {
-  console.error("Usage: my-cli [--depth N] [--json] <files...>");
+  console.error("Usage: my-cli [--depth N] [--json] [--verbose] <files...>");
   process.exit(1);
 }
 
 const resolvedFiles = files.map((f) => path.resolve(process.cwd(), f));
 
-console.log("Changed files:");
-resolvedFiles.forEach((file) => {
-  console.log(" -", file);
-});
+if (verbose) {
+  console.log("Changed files:");
+  resolvedFiles.forEach((file) => {
+    console.log(" -", file);
+  });
+}
 
-// TODO: parse imports + build dependency graph
 const resolver = new ImportResolver();
 const graph = new DependencyGraph();
 
@@ -47,13 +51,13 @@ for (const file of resolvedFiles) {
   }
 }
 
-// Print the dependencies we collected
+// Output dependencies
 for (const file of resolvedFiles) {
   const deps = graph.getAllDependencies(file, new Set(), depth);
 
   if (outputJson) {
     console.log(JSON.stringify({ file, deps: Array.from(deps) }, null, 2));
-  } else {
+  } else if (verbose) {
     console.log(`\nDependencies of ${file}:`);
     if (deps.length === 0) {
       console.log("   (no dependencies found)");
@@ -61,6 +65,11 @@ for (const file of resolvedFiles) {
       for (const dep of deps) {
         console.log("   ->", dep);
       }
+    }
+  } else {
+    // Default: just print dependencies directly (one per line)
+    for (const dep of deps) {
+      console.log(dep);
     }
   }
 }
