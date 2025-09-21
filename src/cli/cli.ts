@@ -43,7 +43,6 @@ export default class Cli {
     depth: number;
     outputJson: boolean;
   } {
-    console.log("a");
     const opts: string[] = this.getOptions();
     const files: string[] = this.getArguments();
     // Default options
@@ -51,7 +50,6 @@ export default class Cli {
     let outputJson: boolean = false;
     let verbose: boolean = false;
     // Parse args
-    console.log("b");
     for (let i = 0; i < opts.length; i++) {
       if (opts[i] === "--depth" && opts[i + 1]) {
         depth = Number(opts[i + 1]);
@@ -64,7 +62,6 @@ export default class Cli {
         files.push(opts[i] as string);
       }
     }
-    console.log("c");
     return { files, verbose, depth, outputJson };
   }
 }
