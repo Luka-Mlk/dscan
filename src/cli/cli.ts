@@ -8,6 +8,7 @@ interface CLIOptions {
   json?: boolean;
   verbose?: boolean;
   reverse?: boolean;
+  root?: string;
   files: string[];
 }
 
@@ -28,12 +29,30 @@ export class CLI {
 
     const scanner = new FileScanner(this.graph);
 
-    // 🚀 Project-wide scan
-    scanner.scanProject(path.resolve("src"));
+    // Determine root folder to scan
+    const scanRoots: string[] = [];
+    if (this.options.root) {
+      scanRoots.push(this.options.root);
+    } else {
+      // default: scan src/ of current project
+      scanRoots.push(path.resolve("src"));
+    }
 
+    // Include parent folders of target files if outside root
     const absFiles = this.options.files.map((f) => path.resolve(f));
-    const outputter = new Outputter(this.graph, this.options);
+    for (const f of absFiles) {
+      const parentDir = path.dirname(f);
+      if (!scanRoots.includes(parentDir)) {
+        scanRoots.push(parentDir);
+      }
+    }
 
+    // Scan all roots
+    for (const root of scanRoots) {
+      scanner.scanProject(root);
+    }
+
+    const outputter = new Outputter(this.graph, this.options);
     for (const file of absFiles) {
       outputter.print(file);
     }
@@ -41,17 +60,27 @@ export class CLI {
 
   private parseArgs(args: string[]): CLIOptions {
     const options: CLIOptions = { files: [] };
-    for (const arg of args) {
-      if (arg.startsWith("--")) {
-        const key = arg.slice(2);
+
+    for (let i = 0; i < args.length; i++) {
+      const arg = args[i];
+
+      if (arg!.startsWith("--")) {
+        const key = arg!.slice(2);
         if (["json", "verbose", "reverse"].includes(key)) {
           (options as any)[key] = true;
+        } else if (key === "root") {
+          i++;
+          if (!args[i]) {
+            console.error("--root requires a path");
+            process.exit(1);
+          }
+          options.root = path.resolve(args[i] as string);
         } else {
           console.error("Unknown option:", arg);
           process.exit(1);
         }
       } else {
-        options.files.push(arg);
+        options.files.push(arg as string);
       }
     }
     return options;
