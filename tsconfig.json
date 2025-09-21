@@ -7,7 +7,8 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "esnext",
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
     "target": "esnext",
     // For nodejs:
     "lib": ["esnext"],
@@ -26,6 +27,7 @@
 
     // Style Options
     // "allowImportingTsExtensions": true,
+    // "noEmit": true,
     // "emitDeclarationOnly": false,
     // "noImplicitReturns": true,
     // "noImplicitOverride": true,
