@@ -1,67 +1,59 @@
-export default class Cli {
-  constructor() {}
+// src/cli/CLI.ts
+import path from "path";
+import { FileScanner } from "../scanner/fileScanner.js";
+import { DependencyGraph } from "../graph/DependencyGraph.js";
+import { Outputter } from "../formatter/outputter.js";
 
-  /**
-   * Returns the arguments (files)
-   */
-  getArguments(): string[] {
-    const args: string[] = [];
-    for (let arg of process.argv.slice(2)) {
-      if (!arg.startsWith("--")) {
-        args.push(arg);
-      }
-    }
-    return args;
+interface CLIOptions {
+  json?: boolean;
+  verbose?: boolean;
+  reverse?: boolean;
+  files: string[];
+}
+
+export class CLI {
+  private options: CLIOptions;
+  private graph: DependencyGraph;
+
+  constructor(args: string[]) {
+    this.options = this.parseArgs(args);
+    this.graph = new DependencyGraph();
   }
 
-  /**
-   * Returns all options that start with -- (options)
-   */
-  getOptions(): string[] {
-    const options: string[] = [];
-    for (let opt of process.argv.slice(2)) {
-      if (opt.startsWith("--")) {
-        options.push(opt);
+  run() {
+    if (!this.options.files.length) {
+      console.error("No files provided.");
+      process.exit(1);
+    }
+
+    const scanner = new FileScanner(this.graph);
+
+    // 🚀 Project-wide scan
+    scanner.scanProject(path.resolve("src"));
+
+    const absFiles = this.options.files.map((f) => path.resolve(f));
+    const outputter = new Outputter(this.graph, this.options);
+
+    for (const file of absFiles) {
+      outputter.print(file);
+    }
+  }
+
+  private parseArgs(args: string[]): CLIOptions {
+    const options: CLIOptions = { files: [] };
+    for (const arg of args) {
+      if (arg.startsWith("--")) {
+        const key = arg.slice(2);
+        if (["json", "verbose", "reverse"].includes(key)) {
+          (options as any)[key] = true;
+        } else {
+          console.error("Unknown option:", arg);
+          process.exit(1);
+        }
+      } else {
+        options.files.push(arg);
       }
     }
     return options;
-  }
-
-  validInputs(): boolean {
-    if (this.getArguments().length < 1) {
-      console.error(
-        "Usage: my-cli [--depth N] [--json] [--verbose] <files...> ",
-      );
-      return false;
-    }
-    return true;
-  }
-
-  parseInput(): {
-    files: string[];
-    verbose: boolean;
-    depth: number;
-    outputJson: boolean;
-  } {
-    const opts: string[] = this.getOptions();
-    const files: string[] = this.getArguments();
-    // Default options
-    let depth = Infinity;
-    let outputJson: boolean = false;
-    let verbose: boolean = false;
-    // Parse args
-    for (let i = 0; i < opts.length; i++) {
-      if (opts[i] === "--depth" && opts[i + 1]) {
-        depth = Number(opts[i + 1]);
-        i++;
-      } else if (opts[i] === "--json") {
-        outputJson = true;
-      } else if (opts[i] === "--verbose") {
-        verbose = true;
-      } else {
-        files.push(opts[i] as string);
-      }
-    }
-    return { files, verbose, depth, outputJson };
   }
 }
