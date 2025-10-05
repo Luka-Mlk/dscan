@@ -6,11 +6,11 @@ import { DependencyGraph } from "../graph/DependencyGraph.js";
 import type { ImportType } from "../graph/graphNode.js";
 
 export class FileScanner {
-  private graph: DependencyGraph;
+  graph: DependencyGraph;
   private visitedFiles: Set<string>;
 
-  constructor(graph: DependencyGraph) {
-    this.graph = graph;
+  constructor() {
+    this.graph = new DependencyGraph();
     this.visitedFiles = new Set();
   }
 

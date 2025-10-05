@@ -1,7 +1,6 @@
 // src/cli/CLI.ts
 import path from "path";
 import { FileScanner } from "../scanner/fileScanner.js";
-import { DependencyGraph } from "../graph/DependencyGraph.js";
 import { Outputter } from "../formatter/outputter.js";
 
 interface CLIOptions {
@@ -14,20 +13,18 @@ interface CLIOptions {
 
 export class CLI {
   private options: CLIOptions;
-  private graph: DependencyGraph;
 
   constructor(args: string[]) {
     this.options = this.parseArgs(args);
-    this.graph = new DependencyGraph();
   }
 
-  run() {
+  runScanner() {
     if (!this.options.files.length) {
       console.error("No files provided.");
       process.exit(1);
     }
 
-    const scanner = new FileScanner(this.graph);
+    const scanner = new FileScanner();
 
     // Determine root folder to scan
     const scanRoots: string[] = [];
@@ -40,19 +37,13 @@ export class CLI {
 
     // Include parent folders of target files if outside root
     const absFiles = this.options.files.map((f) => path.resolve(f));
-    for (const f of absFiles) {
-      const parentDir = path.dirname(f);
-      if (!scanRoots.includes(parentDir)) {
-        scanRoots.push(parentDir);
-      }
-    }
 
     // Scan all roots
     for (const root of scanRoots) {
       scanner.scanProject(root);
     }
 
-    const outputter = new Outputter(this.graph, this.options);
+    const outputter = new Outputter(scanner.graph, this.options);
     for (const file of absFiles) {
       outputter.print(file);
     }

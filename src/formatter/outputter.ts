@@ -26,8 +26,8 @@ export class Outputter {
     if (this.options.json) {
       const output = {
         file: node.filePath,
-        dependencies: Array.from(node.dependencies.keys()),
-        dependants: Array.from(node.dependants),
+        dependencies: this.graph.getAllDependenciesRecursively(targetFile),
+        dependants: this.graph.getAllDependantsRecursively(targetFile),
       };
       console.log(JSON.stringify(output, null, 2));
       return;
@@ -35,7 +35,7 @@ export class Outputter {
 
     let filesToShow: string[];
     if (this.options.reverse) {
-      filesToShow = this.graph.getDependants(targetFile);
+      filesToShow = this.graph.getAllDependantsRecursively(targetFile);
     } else {
       filesToShow = this.graph.getDependencies(targetFile);
     }
