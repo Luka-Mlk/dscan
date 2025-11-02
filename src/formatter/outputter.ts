@@ -1,4 +1,3 @@
-// src/formatter/Outputter.ts
 import { DependencyGraph } from "../graph/DependencyGraph.js";
 
 interface OutputOptions {

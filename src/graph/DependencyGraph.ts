@@ -1,4 +1,3 @@
-// src/graph/DependencyGraph.ts
 import { GraphNode } from "./graphNode.js";
 import type { ImportType } from "./graphNode.js";
 
@@ -37,7 +36,7 @@ export class DependencyGraph {
     const node = this.nodes.get(filePath);
     if (!node) return [];
 
-    // Start with the direct dependants
+    // Start with direct dependants
     node.dependants.forEach((dependantPath) => {
       if (!allDependants.has(dependantPath)) {
         allDependants.add(dependantPath);
@@ -72,7 +71,7 @@ export class DependencyGraph {
     const node = this.nodes.get(filePath);
     if (!node) return [];
 
-    // Start with the direct dependencies
+    // Start with direct dependencies
     node.dependencies.keys().forEach((dependencyPath) => {
       if (!allDependencies.has(dependencyPath)) {
         allDependencies.add(dependencyPath);
@@ -102,7 +101,7 @@ export class DependencyGraph {
     return Array.from(this.nodes.get(filePath)?.dependencies.keys() || []);
   }
 
-  // Simple cycle detection using DFS
+  // Simple cycle detection DFS
   detectCycles(): string[][] {
     const visited = new Set<string>();
     const stack = new Set<string>();

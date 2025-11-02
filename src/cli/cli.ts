@@ -1,4 +1,3 @@
-// src/cli/CLI.ts
 import path from "path";
 import { FileScanner } from "../scanner/fileScanner.js";
 import { Outputter } from "../formatter/outputter.js";
@@ -26,7 +25,7 @@ export class CLI {
 
     const scanner = new FileScanner();
 
-    // Determine root folder to scan
+    // Determine root
     const scanRoots: string[] = [];
     if (this.options.root) {
       scanRoots.push(this.options.root);
