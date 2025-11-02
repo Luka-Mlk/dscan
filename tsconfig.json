@@ -1,51 +1,33 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
     "rootDir": "./src",
     "outDir": "./dist",
 
-    // Environment Settings
-    // See also https://aka.ms/tsconfig/module
+    // Environment Settings (Modern ESM for Node.js)
     "moduleResolution": "nodenext",
     "module": "nodenext",
     "target": "esnext",
-    // For nodejs:
     "lib": ["esnext"],
     "types": ["node"],
-    // and npm install -D @types/node
 
     // Other Outputs
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
 
-    // Stricter Typechecking Options
-    "esModuleInterop": true,
+    // Stricter Typechecking Options (Kept strict settings)
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
 
-    // Style Options
-    // "allowImportingTsExtensions": true,
-    // "noEmit": true,
-    // "emitDeclarationOnly": false,
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
-
-    // Recommended Options
+    // Style & Safety Options
     "strict": true,
-    "jsx": "react-jsx",
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true,
-    "baseUrl": "./"
+    "skipLibCheck": true
   },
   "exclude": ["node_modules"],
+  // Include your CLI entry point in the root of the project structure
   "include": ["./src/**/*.ts", "./bin/*.ts"]
 }
