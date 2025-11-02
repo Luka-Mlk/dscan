@@ -1,4 +1,3 @@
-// src/scanner/FileScanner.ts
 import ts from "typescript";
 import path from "path";
 import fs from "fs";
@@ -9,13 +8,57 @@ export class FileScanner {
   graph: DependencyGraph;
   private visitedFiles: Set<string>;
 
+  // TypeScript configuration for module resolution
+  private compilerOptions!: ts.CompilerOptions;
+  private moduleResolutionHost!: ts.ModuleResolutionHost;
+
   constructor() {
     this.graph = new DependencyGraph();
     this.visitedFiles = new Set();
   }
 
+  /**
+   * Loads the tsconfig.json and initializes the necessary compiler components
+   * to correctly resolve module paths and aliases.
+   */
+  loadConfig(rootDir: string, tsconfigPath: string = "tsconfig.json") {
+    // 1. Find config
+    const configPath = ts.findConfigFile(
+      rootDir,
+      ts.sys.fileExists,
+      tsconfigPath,
+    );
+
+    if (!configPath) {
+      console.warn(
+        `[FileScanner] Warning: tsconfig file not found at or above ${rootDir}. Aliases will not be resolved.`,
+      );
+      this.compilerOptions = ts.getDefaultCompilerOptions();
+      this.moduleResolutionHost = ts.sys;
+      return;
+    }
+
+    // 2. Read and parse the config
+    const configFile = ts.readConfigFile(configPath, ts.sys.readFile);
+    const parsedConfig = ts.parseJsonConfigFileContent(
+      configFile.config,
+      ts.sys,
+      path.dirname(configPath),
+    );
+
+    // 3. Store options and create host for resolution
+    this.compilerOptions = parsedConfig.options;
+    this.moduleResolutionHost = ts.createCompilerHost(
+      this.compilerOptions,
+      true,
+    );
+  }
+
   // 🚀 Scan the whole project (starting from a directory, e.g. "src")
-  scanProject(rootDir: string) {
+  scanProject(rootDir: string, tsconfigPath: string = "tsconfig.json") {
+    // Load config before scanning to enable alias resolution
+    this.loadConfig(rootDir, tsconfigPath);
+
     this.walkDir(rootDir).forEach((file) => this.scanFile(file));
   }
 
@@ -84,41 +127,43 @@ export class FileScanner {
     if (!resolvedPath) return;
 
     this.graph.addEdge(fromFile, resolvedPath, type);
+    // Recurse to scan the newly discovered file (optional, but good practice for full graph)
+    this.scanFile(resolvedPath);
   }
 
+  /**
+   * Resolves an import path using the TypeScript compiler's logic,
+   * which correctly handles aliases, relative paths, and extensions.
+   */
   private resolveImport(fromFile: string, importedPath: string): string | null {
-    if (importedPath.startsWith(".") || importedPath.startsWith("/")) {
-      const basePath = path.resolve(path.dirname(fromFile), importedPath);
+    // 1. Use the TypeScript API for resolution
+    const resolved = ts.resolveModuleName(
+      importedPath,
+      fromFile,
+      this.compilerOptions,
+      this.moduleResolutionHost,
+    );
 
-      const candidates = [];
+    if (resolved.resolvedModule && resolved.resolvedModule.resolvedFileName) {
+      let finalPath = resolved.resolvedModule.resolvedFileName;
 
-      if (importedPath.endsWith(".js")) {
-        // try .ts alternative first
-        candidates.push(basePath.replace(/\.js$/, ".ts"));
-        candidates.push(basePath.replace(/\.js$/, ".tsx"));
+      // 2. Filter out external node_modules
+      if (finalPath.includes("node_modules")) {
+        return null;
       }
 
-      candidates.push(basePath); // exact path
-      candidates.push(
-        basePath + ".ts",
-        basePath + ".tsx",
-        basePath + ".js",
-        basePath + ".jsx",
-      );
-      candidates.push(
-        basePath + "/index.ts",
-        basePath + "/index.tsx",
-        basePath + "/index.js",
-        basePath + "/index.jsx",
-      );
-
-      for (const candidate of candidates) {
-        if (fs.existsSync(candidate)) return path.resolve(candidate);
+      // 3. Normalize the path and ensure it points to a source file
+      // TypeScript resolution often points to .js or .d.ts files, but we want the original .ts
+      if (finalPath.endsWith(".d.ts")) {
+        finalPath = finalPath.replace(/\.d\.ts$/, ".ts");
       }
 
-      return null;
-    } else {
-      return null; // external module
+      // Final sanity check and normalization
+      if (fs.existsSync(finalPath) && /\.(ts|tsx|js|jsx)$/.test(finalPath)) {
+        return path.resolve(finalPath);
+      }
     }
+
+    return null;
   }
 }
