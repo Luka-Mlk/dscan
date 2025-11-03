@@ -38,7 +38,7 @@ export class FileScanner {
       return;
     }
 
-    // 2. Read and parse the config
+    // 2. Read and parse config
     const configFile = ts.readConfigFile(configPath, ts.sys.readFile);
     const parsedConfig = ts.parseJsonConfigFileContent(
       configFile.config,
@@ -54,9 +54,9 @@ export class FileScanner {
     );
   }
 
-  // 🚀 Scan the whole project (starting from a directory, e.g. "src")
+  // Scan whole project
   scanProject(rootDir: string, tsconfigPath: string = "tsconfig.json") {
-    // Load config before scanning to enable alias resolution
+    // Load config before scan for alias resolution
     this.loadConfig(rootDir, tsconfigPath);
 
     this.walkDir(rootDir).forEach((file) => this.scanFile(file));
@@ -70,8 +70,9 @@ export class FileScanner {
       const fullPath = path.join(dir, entry.name);
 
       if (entry.isDirectory()) {
+        // skip noise
         if (entry.name === "node_modules" || entry.name === "dist") {
-          continue; // 🚫 skip noise
+          continue;
         }
         results.push(...this.walkDir(fullPath));
       } else if (/\.(ts|tsx|js|jsx)$/.test(entry.name)) {
@@ -127,7 +128,7 @@ export class FileScanner {
     if (!resolvedPath) return;
 
     this.graph.addEdge(fromFile, resolvedPath, type);
-    // Recurse to scan the newly discovered file (optional, but good practice for full graph)
+    // Recurse to scan the newly discovered file
     this.scanFile(resolvedPath);
   }
 

@@ -1,26 +1,21 @@
 {
   "compilerOptions": {
-    // File Layout
     "rootDir": "./src",
     "outDir": "./dist",
 
-    // Environment Settings (Modern ESM for Node.js)
     "moduleResolution": "nodenext",
     "module": "nodenext",
     "target": "esnext",
     "lib": ["esnext"],
     "types": ["node"],
 
-    // Other Outputs
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
 
-    // Stricter Typechecking Options (Kept strict settings)
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
 
-    // Style & Safety Options
     "strict": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
@@ -28,6 +23,5 @@
     "skipLibCheck": true
   },
   "exclude": ["node_modules"],
-  // Include your CLI entry point in the root of the project structure
   "include": ["./src/**/*.ts", "./bin/*.ts"]
 }

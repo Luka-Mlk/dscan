@@ -1,4 +1,3 @@
-// src/graph/GraphNode.ts
 export type ImportType = "import" | "require";
 
 export class GraphNode {
