@@ -25,26 +25,20 @@ export class CLI {
 
     const scanner = new FileScanner();
 
-    // Determine root
-    const scanRoots: string[] = [];
+    // Get root
+    let scanRoots: string;
     if (this.options.root) {
-      scanRoots.push(this.options.root);
+      scanRoots = this.options.root;
     } else {
       // default: scan src/ of current project
-      scanRoots.push(path.resolve("src"));
+      scanRoots = path.resolve("src");
     }
 
-    // Include parent folders of target files if outside root
-    const absFiles = this.options.files.map((f) => path.resolve(f));
-
-    // Scan all roots
-    for (const root of scanRoots) {
-      scanner.scanProject(root);
-    }
+    scanner.scanProject(scanRoots);
 
     const outputter = new Outputter(scanner.graph, this.options);
-    for (const file of absFiles) {
-      outputter.print(file);
+    for (const file of this.options.files) {
+      outputter.print(`${scanRoots}/` + file);
     }
   }
 
