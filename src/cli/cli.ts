@@ -7,6 +7,7 @@ type CLIOptions = {
   verbose?: boolean;
   reverse?: boolean;
   root?: string;
+  tsconfig?: string;
   files: string[];
 };
 
@@ -27,7 +28,7 @@ export class CLI {
 
     let scanRoots: string = this.setRoot();
 
-    scanner.scanProject(scanRoots);
+    scanner.scanProject(scanRoots, this.options.tsconfig);
 
     const outputter = new Outputter(scanner.graph, this.options);
     for (const file of this.options.files) {
@@ -64,6 +65,9 @@ export class CLI {
             process.exit(1);
           }
           options.root = path.resolve(args[i] as string);
+        } else if (key === "tsconfig") {
+          i++;
+          (options as any)[key] = args[i] as string;
         } else {
           console.error("Unknown option:", arg);
           process.exit(1);

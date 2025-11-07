@@ -31,7 +31,7 @@ export class FileScanner {
 
     if (!configPath) {
       console.warn(
-        `[FileScanner] Warning: tsconfig file not found at or above ${rootDir}. Aliases will not be resolved.`,
+        `[FileScanner] Warning: tsconfig file ${tsconfigPath} not found at or above ${rootDir}. Aliases will not be resolved.`,
       );
       this.compilerOptions = ts.getDefaultCompilerOptions();
       this.moduleResolutionHost = ts.sys;
