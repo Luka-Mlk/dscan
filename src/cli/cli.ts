@@ -2,13 +2,13 @@ import path from "path";
 import { FileScanner } from "../scanner/fileScanner.js";
 import { Outputter } from "../formatter/outputter.js";
 
-interface CLIOptions {
+type CLIOptions = {
   json?: boolean;
   verbose?: boolean;
   reverse?: boolean;
   root?: string;
   files: string[];
-}
+};
 
 export class CLI {
   private options: CLIOptions;
@@ -25,20 +25,25 @@ export class CLI {
 
     const scanner = new FileScanner();
 
-    // Get root
-    let scanRoots: string;
-    if (this.options.root) {
-      scanRoots = this.options.root;
-    } else {
-      // default: scan src/ of current project
-      scanRoots = path.resolve("src");
-    }
+    let scanRoots: string = this.setRoot();
 
     scanner.scanProject(scanRoots);
 
     const outputter = new Outputter(scanner.graph, this.options);
     for (const file of this.options.files) {
-      outputter.print(`${scanRoots}/` + file);
+      outputter.print(`${scanRoots}/${file}`);
+    }
+  }
+
+  /**
+   * Set's root depending on
+   */
+  private setRoot() {
+    if (this.options.root) {
+      return this.options.root;
+    } else {
+      // default: scan src/ of current project
+      return path.resolve("src");
     }
   }
 

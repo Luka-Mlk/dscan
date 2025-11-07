@@ -1,10 +1,10 @@
 import { DependencyGraph } from "../graph/DependencyGraph.js";
 
-interface OutputOptions {
+type OutputOptions = {
   json?: boolean;
   verbose?: boolean;
   reverse?: boolean;
-}
+};
 
 export class Outputter {
   private graph: DependencyGraph;
