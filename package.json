@@ -1,9 +1,9 @@
 {
-  "name": "depfnd",
-  "version": "1.0.1",
+  "name": "dscan",
+  "version": "1.0.2",
   "main": "index.js",
   "bin": {
-    "depfnd": "dist/index.js"
+    "dscan": "dist/index.js"
   },
   "scripts": {
     "dev": "tsx src/index.ts",
@@ -11,14 +11,22 @@
     "start": "node dist/index.js",
     "test": ""
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "dscan.png",
+    "tsconfig.json"
+  ],
   "type": "module",
   "keywords": [],
   "author": "luka_m",
   "license": "ISC",
   "description": "",
+  "dependencies": {
+    "typescript": "^5.9.2"
+  },
   "devDependencies": {
     "@types/node": "^24.3.1",
-    "tsx": "^4.20.5",
-    "typescript": "^5.9.2"
+    "tsx": "^4.20.5"
   }
 }
