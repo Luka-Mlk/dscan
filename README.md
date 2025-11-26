@@ -6,6 +6,8 @@ dscan is a unix like command-line tool written in TypeScript that helps you trac
     <img src="dscan.png" width="300px">
 </figure>
 
+[Repository](https://github.com/Luka-Mlk/dscan)
+
 ## Quickstart
 
 dscan allows you to quickly identify which files in your project are importing or being imported by specific packages. Here’s a simple example to get started.
