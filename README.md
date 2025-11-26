@@ -1,6 +1,6 @@
 # Depfnd
 
-Depfnd is a command-line tool written in TypeScript that helps you track dependencies and dependants in JavaScript projects
+depfnd is a unix like command-line tool written in TypeScript that helps you track dependencies and dependants in JavaScript projects
 
 <figure>
     <img src="depfnd.png" width="300px">
@@ -93,7 +93,7 @@ $ depfnd --tsconfig tsconfig.app.json --reverse --root src graph/DependencyGraph
 #### Warning output
 
 ```bash
-[FileScanner] Warning: tsconfig file tsconfig.app.json not found at or above /home/luka/Projects/depfnd/src. Aliases will not be resolved.
+[FileScanner] Warning: tsconfig file tsconfig.app.json not found at or above /home/user/Projects/depfnd/src. Aliases will not be resolved.
 /home/user/Projects/depfnd/src/index.ts
 ```
 
