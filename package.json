@@ -1,6 +1,6 @@
 {
   "name": "dscan",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "index.js",
   "bin": {
     "dscan": "dist/index.js"
@@ -22,9 +22,11 @@
   "author": "luka_m",
   "license": "ISC",
   "description": "",
+  "dependencies": {
+    "typescript": "^5.9.2"
+  },
   "devDependencies": {
     "@types/node": "^24.3.1",
-    "tsx": "^4.20.5",
-    "typescript": "^5.9.2"
+    "tsx": "^4.20.5"
   }
 }
