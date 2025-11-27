@@ -15,20 +15,28 @@ export class Outputter {
     this.options = options;
   }
 
-  print(targetFile: string) {
+  formatJSON(
+    targetFile: string,
+  ):
+    | { file: string; dependencies: string[]; dependants: string[] }
+    | undefined {
     const node = this.graph.getNode(targetFile);
     if (!node) {
       console.error("File not found in graph:", targetFile);
       return;
     }
 
-    if (this.options.json) {
-      const output = {
-        file: node.filePath,
-        dependencies: this.graph.getAllDependenciesRecursively(targetFile),
-        dependants: this.graph.getAllDependantsRecursively(targetFile),
-      };
-      console.log(JSON.stringify(output, null, 2));
+    return {
+      file: node.filePath,
+      dependencies: this.graph.getAllDependenciesRecursively(targetFile),
+      dependants: this.graph.getAllDependantsRecursively(targetFile),
+    };
+  }
+
+  formatFiles(targetFile: string): string[] | undefined {
+    const node = this.graph.getNode(targetFile);
+    if (!node) {
+      console.error("File not found in graph:", targetFile);
       return;
     }
 
@@ -39,14 +47,37 @@ export class Outputter {
       filesToShow = this.graph.getDependencies(targetFile);
     }
 
+    let outputLines: string[] = [];
+
     if (this.options.verbose) {
-      console.log(`Target file: ${targetFile}`);
-      console.log(this.options.reverse ? "Dependants:" : "Dependencies:");
+      outputLines.push(`Target file: ${targetFile}`);
+      outputLines.push(this.options.reverse ? "Dependants:" : "Dependencies:");
       for (const f of filesToShow) {
-        console.log(`- ${f}`);
+        outputLines.push(`- ${f}`);
       }
     } else {
-      filesToShow.forEach((f) => console.log(f));
+      outputLines.push(...filesToShow);
     }
+
+    return outputLines;
+  }
+
+  printJSON(
+    JSONOutput: {
+      file: string;
+      dependencies: string[];
+      dependants: string[];
+    }[],
+  ): void {
+    console.log(JSON.stringify(JSONOutput, null, 2));
+  }
+
+  printVerbose(stringOutput: string[]) {
+    stringOutput.forEach((line) => console.log(line));
+  }
+
+  printRegular(stringOutput: string[]) {
+    const uniqueFiles = Array.from(new Set(stringOutput));
+    uniqueFiles.forEach((f) => console.log(f));
   }
 }

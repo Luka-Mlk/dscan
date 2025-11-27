@@ -25,14 +25,42 @@ export class CLI {
     }
 
     const scanner = new FileScanner();
-
     let scanRoots: string = this.setRoot();
-
     scanner.scanProject(scanRoots, this.options.tsconfig);
 
     const outputter = new Outputter(scanner.graph, this.options);
+
+    let JSONOutput: {
+      file: string;
+      dependencies: string[];
+      dependants: string[];
+    }[] = [];
+    let stringOutput: string[] = [];
+
     for (const file of this.options.files) {
-      outputter.print(`${scanRoots}/${file}`);
+      const targetPath = `${scanRoots}/${file}`;
+
+      if (this.options.json) {
+        const result = outputter.formatJSON(targetPath);
+        if (result) {
+          JSONOutput.push(result);
+        }
+      } else {
+        const result = outputter.formatFiles(targetPath);
+        if (result) {
+          stringOutput.push(...result);
+        }
+      }
+    }
+    if (this.options.json) {
+      outputter.printJSON(JSONOutput);
+      return;
+    }
+
+    if (this.options.verbose) {
+      outputter.printVerbose(stringOutput);
+    } else {
+      outputter.printRegular(stringOutput);
     }
   }
 
