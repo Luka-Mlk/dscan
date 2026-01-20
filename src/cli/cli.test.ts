@@ -27,6 +27,29 @@ test("should return correct json output", () => {
   assert.strictEqual(result.trim(), expected.trim());
 });
 
+test("should return correct json output", () => {
+  const cli = new CLI(["-j", "--root", "src", "graph/DependencyGraph.ts"]);
+  const result = cli.runScanner();
+
+  const expected = `[
+  {
+    "file": "${root}/src/graph/DependencyGraph.ts",
+    "dependencies": [
+      "${root}/src/graph/graphNode.ts"
+    ],
+    "dependants": [
+      "${root}/src/scanner/fileScanner.ts",
+      "${root}/src/formatter/outputter.ts",
+      "${root}/src/cli/cli.ts",
+      "${root}/src/cli/cli.test.ts",
+      "${root}/src/index.ts"
+    ]
+  }
+]`;
+
+  assert.strictEqual(result.trim(), expected.trim());
+});
+
 test("should return correct reverse default output", () => {
   const cli = new CLI([
     "--reverse",
