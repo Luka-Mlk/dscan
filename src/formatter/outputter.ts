@@ -68,16 +68,27 @@ export class Outputter {
       dependencies: string[];
       dependants: string[];
     }[],
-  ): void {
+  ): string {
     console.log(JSON.stringify(JSONOutput, null, 2));
+    return JSON.stringify(JSONOutput, null, 2);
   }
 
-  printVerbose(stringOutput: string[]) {
-    stringOutput.forEach((line) => console.log(line));
+  printVerbose(stringOutput: string[]): string {
+    let output = "";
+    stringOutput.forEach((line) => {
+      output += line + "\n";
+    });
+    console.log(output);
+    return output;
   }
 
-  printRegular(stringOutput: string[]) {
+  printRegular(stringOutput: string[]): string {
+    let output = "";
     const uniqueFiles = Array.from(new Set(stringOutput));
-    uniqueFiles.forEach((f) => console.log(f));
+    uniqueFiles.forEach((f) => {
+      output += f + "\n";
+    });
+    console.log(output);
+    return output;
   }
 }

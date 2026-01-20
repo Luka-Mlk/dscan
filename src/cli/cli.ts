@@ -53,14 +53,13 @@ export class CLI {
       }
     }
     if (this.options.json) {
-      outputter.printJSON(JSONOutput);
-      return;
+      return outputter.printJSON(JSONOutput);
     }
 
     if (this.options.verbose) {
-      outputter.printVerbose(stringOutput);
+      return outputter.printVerbose(stringOutput);
     } else {
-      outputter.printRegular(stringOutput);
+      return outputter.printRegular(stringOutput);
     }
   }
 
