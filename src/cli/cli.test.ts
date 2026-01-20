@@ -70,3 +70,9 @@ ${root}/src/index.ts`;
 
   assert.strictEqual(result.trim(), expected.trim());
 });
+
+test("should ignore non-typescript/javascript files", () => {
+  const cli = new CLI(["--root", "src", "../package.json"]);
+  const result = cli.runScanner();
+  assert.strictEqual(result.trim(), "");
+});
