@@ -1,7 +1,17 @@
 {
   "name": "dscan",
   "version": "1.0.3",
-  "main": "index.js",
+  "main": "./dist/api.js",
+  "exports": {
+    ".": {
+      "import": "./dist/api.js",
+      "types": "./dist/api.d.ts"
+    },
+    "./cli": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "bin": {
     "dscan": "dist/index.js"
   },

@@ -16,6 +16,7 @@ test("should return correct json output", () => {
     ],
     "dependants": [
       "${root}/src/scanner/fileScanner.ts",
+      "${root}/src/api.ts",
       "${root}/src/formatter/outputter.ts",
       "${root}/src/cli/cli.ts",
       "${root}/src/cli/cli.test.ts",
@@ -39,6 +40,7 @@ test("should return correct json output", () => {
     ],
     "dependants": [
       "${root}/src/scanner/fileScanner.ts",
+      "${root}/src/api.ts",
       "${root}/src/formatter/outputter.ts",
       "${root}/src/cli/cli.ts",
       "${root}/src/cli/cli.test.ts",
@@ -59,6 +61,7 @@ test("should return correct reverse default output", () => {
   ]);
   const result = cli.runScanner();
   const expected = `${root}/src/scanner/fileScanner.ts
+${root}/src/api.ts
 ${root}/src/formatter/outputter.ts
 ${root}/src/cli/cli.ts
 ${root}/src/cli/cli.test.ts
@@ -86,6 +89,7 @@ test("should return correct reverse for custom typescript aliases output", () =>
   ]);
   const result = cli.runScanner();
   const expected = `${root}/src/scanner/fileScanner.ts
+${root}/src/api.ts
 ${root}/src/formatter/outputter.ts
 ${root}/src/cli/cli.ts
 ${root}/src/cli/cli.test.ts
