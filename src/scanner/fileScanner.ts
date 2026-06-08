@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import { DependencyGraph } from "../graph/DependencyGraph.js";
 import type { ImportType } from "../graph/graphNode.js";
+import { warnings } from "../diagnostic/index.js";
 
 export class FileScanner {
   graph: DependencyGraph;
@@ -30,9 +31,7 @@ export class FileScanner {
     );
 
     if (!configPath) {
-      console.warn(
-        `[FileScanner] Warning: tsconfig file ${tsconfigPath} not found at or above ${rootDir}. Aliases will not be resolved.`,
-      );
+      warnings.TS_CONFIG_NOT_FOUND(tsconfigPath);
       this.compilerOptions = ts.getDefaultCompilerOptions();
       this.moduleResolutionHost = ts.sys;
       return;
@@ -40,6 +39,12 @@ export class FileScanner {
 
     // 2. Read and parse config
     const configFile = ts.readConfigFile(configPath, ts.sys.readFile);
+    if (configFile.error) {
+      warnings.TS_CONFIG_PARSE_ERROR(configPath);
+      this.compilerOptions = ts.getDefaultCompilerOptions();
+      this.moduleResolutionHost = ts.sys;
+      return;
+    }
     const parsedConfig = ts.parseJsonConfigFileContent(
       configFile.config,
       ts.sys,
