@@ -31,7 +31,7 @@
   "type": "module",
   "keywords": [],
   "author": "luka_m",
-  "license": "ISC",
+  "license": "MPL-2.0",
   "description": "",
   "dependencies": {
     "typescript": "^5.9.2"
