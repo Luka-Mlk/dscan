@@ -1,22 +1,16 @@
 import path from "path";
 import { FileScanner } from "../scanner/fileScanner.js";
 import { Outputter } from "../formatter/outputter.js";
+import { errors } from "../diagnostic/index.js";
+import type { CLITypes } from "./types.js";
+import { IncorrectArgumentValue } from "../diagnostic/errors.js";
 
 // --- Types & Configuration ---
-
-type CLIOptions = {
-  json?: boolean;
-  verbose?: boolean;
-  reverse?: boolean;
-  root?: string;
-  tsconfig?: string;
-  files: string[];
-};
 
 type ParserState = "IDLE" | "CAPTURE_VALUE";
 
 interface FlagDef {
-  key: keyof CLIOptions;
+  key: keyof CLITypes.CLIOptions;
   type: "boolean" | "value";
 }
 
@@ -33,7 +27,7 @@ const FLAG_MAP: Record<string, FlagDef> = {
 // --- CLI Class Implementation ---
 
 export class CLI {
-  private options: CLIOptions = { files: [] };
+  private options: CLITypes.CLIOptions = { files: [] };
 
   // State tracking for debugging/testing
   private currentState: ParserState = "IDLE";
@@ -95,7 +89,7 @@ export class CLI {
 
     // Final Validation: Ensure we aren't hanging in a capture state
     if (this.currentState === "CAPTURE_VALUE") {
-      this.handleError(`Missing value for flag: --${this.activeFlag?.key}`);
+      throw new errors.MissingArgumentError(`${this.activeFlag?.key}`);
     }
   }
 
@@ -114,15 +108,13 @@ export class CLI {
           this.currentState = "CAPTURE_VALUE";
         }
       } else if (token.startsWith("--") || token.startsWith("-")) {
-        this.handleError(`Unknown option: ${token}`);
+        throw new errors.UnknownOptionError(token);
       } else {
         this.options.files.push(token);
       }
     } else if (this.currentState === "CAPTURE_VALUE") {
       if (token.startsWith("--") || token.startsWith("-")) {
-        this.handleError(
-          `Expected value for --${this.activeFlag?.key}, but got flag "${token}"`,
-        );
+        throw new IncorrectArgumentValue(`${this.activeFlag?.key}`, token);
       }
 
       this.applyValue(this.activeFlag!.key, token);
@@ -136,7 +128,7 @@ export class CLI {
   /**
    * Applies a captured value to the options object with specific logic per key.
    */
-  private applyValue(key: keyof CLIOptions, value: string) {
+  private applyValue(key: keyof CLITypes.CLIOptions, value: string) {
     if (key === "root") {
       this.options.root = path.resolve(value);
     } else if (key === "files") {
@@ -156,13 +148,8 @@ export class CLI {
     this.activeFlag = null;
   }
 
-  private handleError(message: string): never {
-    console.error(message);
-    process.exit(1);
-  }
-
   // Getter for testing/debugging
-  public getParsedOptions(): CLIOptions {
+  public getParsedOptions(): CLITypes.CLIOptions {
     return { ...this.options };
   }
 }
